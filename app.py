@@ -1,6 +1,18 @@
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+import model as mdl
+import json, jsonify
+
 app = Flask(__name__)
+
+
+@app.route('/predict',methods=['POST'])
+def predict():
+    data = request.get_json(force=True)
+    text = data['txt']
+    prediction = mdl.predict(text)
+    output = prediction
+    return jsonify(output)
 
 
 @app.route('/')
