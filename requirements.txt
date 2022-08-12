@@ -1,5 +1,4 @@
-Flask==2.0.2
+Flask
 transformers
-torch
 jsonify
 sklearn

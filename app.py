@@ -1,7 +1,8 @@
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+import os
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 import model as mdl
-import json, jsonify
+import json
 
 app = Flask(__name__)
 
@@ -18,7 +19,9 @@ def predict():
 @app.route('/')
 def index():
    print('Request for index page received')
-   return render_template('index.html')
+   return "Hello NLP Demo"
+#    return render_template('index.html')
+    
 
 @app.route('/favicon.ico')
 def favicon():
@@ -38,4 +41,4 @@ def hello():
 
 
 if __name__ == '__main__':
-   app.run()
+   app.run(host="0.0.0.0", port=8080)
