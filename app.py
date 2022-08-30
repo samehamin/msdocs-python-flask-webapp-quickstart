@@ -3,6 +3,9 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 import model as mdl
 import json
+import numpy as np
+from waitress import serve 
+
 
 app = Flask(__name__)
 
@@ -10,10 +13,15 @@ app = Flask(__name__)
 @app.route('/predict',methods=['POST'])
 def predict():
     data = request.get_json(force=True)
+    lang = data['lang']
     text = data['txt']
-    prediction = mdl.predict(text)
-    output = prediction
-    return jsonify(output)
+    prediction = mdl.predict(text, lang)
+    # output = prediction
+    return jsonify(
+        score = prediction[1],
+        intent = prediction[0],
+        ranked_intents = prediction[2]
+    )
 
 
 @app.route('/')
@@ -41,4 +49,5 @@ def hello():
 
 
 if __name__ == '__main__':
-   app.run(host="0.0.0.0", port=8080)
+    serve(app, host="0.0.0.0", port=8080)
+#    app.run(host="0.0.0.0", port=8080)

@@ -1,76 +1,151 @@
-from inspect import getmodule
+from inspect import getclasstree, getmodule
 import requests
 import json
 from transformers import AutoModel, AutoTokenizer 
+from transformers import pipeline
+from transformers import AutoModelForSequenceClassification
 import torch
 import pickle
+import pandas as pd
+import numpy as np
+import operator
 
 
-def getLabels():
-    INTENTS = ['datetime_query', 'iot_hue_lightchange', 'transport_ticket', 'takeaway_query', 'qa_stock',
-            'general_greet', 'recommendation_events', 'music_dislikeness', 'iot_wemo_off', 'cooking_recipe',
-            'qa_currency', 'transport_traffic', 'general_quirky', 'weather_query', 'audio_volume_up',
-            'email_addcontact', 'takeaway_order', 'email_querycontact', 'iot_hue_lightup',
-            'recommendation_locations', 'play_audiobook', 'lists_createoradd', 'news_query',
-            'alarm_query', 'iot_wemo_on', 'general_joke', 'qa_definition', 'social_query',
-            'music_settings', 'audio_volume_other', 'calendar_remove', 'iot_hue_lightdim',
-            'calendar_query', 'email_sendemail', 'iot_cleaning', 'audio_volume_down',
-            'play_radio', 'cooking_query', 'datetime_convert', 'qa_maths', 'iot_hue_lightoff',
-            'iot_hue_lighton', 'transport_query', 'music_likeness', 'email_query', 'play_music',
-            'audio_volume_mute', 'social_post', 'alarm_set', 'qa_factoid', 'calendar_set',
-            'play_game', 'alarm_remove', 'lists_remove', 'transport_taxi', 'recommendation_movies',
-            'iot_coffee', 'music_query', 'play_podcasts', 'lists_query']
 
-    return INTENTS
+def getConfig():
+    config_df = pd.read_csv("Data/config.csv")
+    # confValue = config_df["confKey"==confKey].item()
+    return config_df
 
 
-def getModel():
+def getConfigValue(conf_df, confKey):
+    confValue = conf_df.loc[conf_df['confKey'] == confKey, 'confValue'].values[0]
+    return confValue
+
+
+def getIntent(label):
+    labels_df = pd.read_csv("Data/intents.csv")
+    intent = labels_df[labels_df.label == label].intent.item()
+    return intent
+
+
+def getClassifier(lang="all"):
     # load the model from disk
+    foldername = "./Data"
+    filename = ""
+    
+    if lang=="ar":
+        filename = foldername + '/intent-classification-ar.sav'
+    elif lang=="en":
+        filename = foldername + '/intent-classification-en.sav'
+    elif lang=="all":
+        filename = foldername + "/UDModel_banks.sav"
 
-    filename = "./Data" + '/intent-classification-ar.sav'
     loaded_model = pickle.load(open(filename, 'rb'))
     return loaded_model
 
 
-def predict(pred_text):
-    #define the tokenizer
-    model_ckpt = "aubmindlab/bert-base-arabertv2"
-    tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+def getModel(device, model_ckpt):
+    model = AutoModel.from_pretrained(model_ckpt)
+    model = model.to(device)
 
-    # tokenizing the text
-    pred_inputs = tokenizer(pred_text, return_tensors="pt")
-    # print(pred_inputs)
 
-    # define the model
+def predict_user(pred_text, tokenizer, model_ckpt):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = AutoModel.from_pretrained(model_ckpt).to(device)
-
+    
+    # Tokenize the input
+    pred_inputs = tokenizer(pred_text, return_tensors="pt")
     pred_inputs = {k:v.to(device) for k,v in pred_inputs.items()}
+    
+    # get the hidden state
+    # model = getModel(device, model_ckpt)
+    model = AutoModel.from_pretrained(model_ckpt)
+    model = model.to(device)
+
     with torch.no_grad():
         pred_hidden_state = model(**pred_inputs).last_hidden_state[:,0].cpu().numpy()
 
-    # print(pred_hidden_state)
-    classifier = getModel()
-    pred_label = classifier.predict(pred_hidden_state)
-
-    labels = getLabels()
-    # print(labels[pred_label[0]])
-    # print(labels)
-    return labels[pred_label[0]]
+    # get the classifier and predict
+    clfr = getClassifier()
+    pred = clfr.predict(pred_hidden_state), clfr.predict_proba(pred_hidden_state)
+    intent = getIntent(pred[0][0])
+    score = np.max(pred[1])
+    return intent, score
 
 
-# dataset = pd.read_csv('Data/Salary_Data.csv')
-# X = dataset.iloc[:, :-1].values
-# y = dataset.iloc[:, 1].values
+def predict_dsl(tokenizer, predtext):
+    model_ckpt = 'nickprock/xlm-roberta-base-banking77-classification'
+    model_clfr = AutoModelForSequenceClassification.from_pretrained(model_ckpt)
+    pipe = pipeline("text-classification", model=model_clfr, tokenizer=tokenizer)
+    pipepred = pipe(predtext)
+    intent = pipepred[0]['label']
+    score = pipepred[0]['score']
+    return intent, score
 
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33, random_state = 0)
 
-# regressor = LinearRegression()
-# regressor.fit(X_train, y_train)
-# y_pred = regressor.predict(X_test)
+def predict_smallTalk(predtext):
+    classifier = pipeline("zero-shot-classification",
+                    model="joeddav/xlm-roberta-large-xnli")
+    sequence_to_classify = predtext
+    candidate_labels = ["greeting", "general inquiry", "identity check"]
+    pred = classifier(sequence_to_classify, candidate_labels)
+    score = np.max(pred["scores"])
+    idx = pred["scores"].index(score)
+    intent = pred["labels"][idx]
+    return intent, score
 
-# pickle.dump(regressor, open('model.pkl','wb'))
 
-# model = pickle.load(open('model.pkl','rb'))
-# print(model.predict([[1.8]]))
+def predict(pred_text, lang):
 
+    conf_df = getConfig()
+
+    model_ckpt = ""
+    if lang == "ar":
+        #define the tokenizer
+        model_ckpt = "aubmindlab/bert-base-arabertv2"
+    elif lang=="en":
+        model_ckpt = "distilbert-base-uncased"
+    elif lang=="all":
+        model_ckpt = 'nickprock/xlm-roberta-base-banking77-classification'
+
+    tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
+
+    preds = {}
+
+    # Prediction Pipeline
+    #=========================
+    ### User Defined Intents classification
+    #=========================#=========================
+    intent_udml, score_udml = predict_user(pred_text, tokenizer, model_ckpt)
+    preds[intent_udml] = float(score_udml)
+    # threshold = int(getConfigValue(conf_df, "threshold-UDML"))
+    # if score >= threshold:
+    #     return intent, score
+
+    ### Domain Specific prediction (Banking)
+    #=========================#=========================
+    intent_dsl, score_dsl = predict_dsl(tokenizer, pred_text)
+    preds[intent_dsl] = float(score_dsl)
+    # threshold = int(getConfigValue(conf_df, "threshold-DSL"))
+    # if score >= threshold:
+    #     return intent, score 
+
+    ### Small and generic talk (XLMR Facebook multilingual model)
+    #=========================#=========================
+    intent_smalltalk, score_smalltalk = predict_smallTalk(pred_text)
+    preds[intent_smalltalk] = float(score_smalltalk)
+    # threshold = int(getConfigValue(conf_df, "threshold-smallTalk"))
+    # if score >= threshold:
+    #     return intent, score
+
+    # best intent
+    # intent = max(preds)
+    intent = max(preds.items(), key=operator.itemgetter(1))[0]
+    score = preds[intent]
+    threshold = getConfigValue(conf_df, "threshold")
+
+    if score < threshold:
+        intent = "fallback"
+        score = 0.0
+
+    return intent, score, preds
