@@ -9,3 +9,7 @@ matplotlib
 protobuf<=3.20.1
 flask
 waitress
+# install those first sudo apt-get install python3-dev default-libmysqlclient-dev build-essential for mysql
+mysql-connector-python
+mysqlclient
+sqlalchemy
