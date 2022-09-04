@@ -71,6 +71,11 @@ def hello():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     print("server is up and running!")
     serve(app, host="0.0.0.0", port=8080)
+=======
+    print("server started ..")
+    serve(app, host="0.0.0.0", port=5000)
+>>>>>>> a1b9828 (model py)
 #    app.run(host="0.0.0.0", port=8080)
