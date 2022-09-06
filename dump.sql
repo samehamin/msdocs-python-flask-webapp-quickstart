@@ -36,7 +36,7 @@ CREATE TABLE `configs` (
 
 LOCK TABLES `configs` WRITE;
 /*!40000 ALTER TABLE `configs` DISABLE KEYS */;
-INSERT INTO `configs` VALUES (1,'threshold-UDML','0.85'),(2,'threshold-DSL','0.9'),(3,'threshold-smallTalk','0.85'),(4,'threshold','0.85');
+INSERT INTO `configs` VALUES (1,'threshold-UDML','0.85'),(2,'threshold-DSL','0.93'),(3,'threshold-smallTalk','0.8'),(4,'threshold','0.9');
 /*!40000 ALTER TABLE `configs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,6 +118,30 @@ INSERT INTO `intents` VALUES (80,'balance-check'),(81,'add_beneficiary_account')
 UNLOCK TABLES;
 
 --
+-- Table structure for table `intents_small_talk`
+--
+
+DROP TABLE IF EXISTS `intents_small_talk`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `intents_small_talk` (
+  `label` int NOT NULL,
+  `small_talk_intent` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`label`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `intents_small_talk`
+--
+
+LOCK TABLES `intents_small_talk` WRITE;
+/*!40000 ALTER TABLE `intents_small_talk` DISABLE KEYS */;
+INSERT INTO `intents_small_talk` VALUES (1,'greeting'),(2,'general inquiry');
+/*!40000 ALTER TABLE `intents_small_talk` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `user_utterances`
 --
 
@@ -129,7 +153,7 @@ CREATE TABLE `user_utterances` (
   `utterance` text NOT NULL,
   `label` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,4 +175,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-09-06 16:56:29
+-- Dump completed on 2022-09-06 23:14:51
