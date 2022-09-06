@@ -35,6 +35,17 @@ def load_config():
         print("database error occured: {}".format(error))
 
 
+def load_small_talk_intents():
+    smalltalk_df = None
+    try:
+        query = "SELECT * FROM intents_small_talk;"
+        smalltalk_df = mysqlconn.read_df_sqlalchemy(query)
+        print(smalltalk_df.head())
+        return smalltalk_df
+    except mysqlconn.Error as error:
+        print("database error occured: {}".format(error))
+
+
 def getConfigValue(confKey):
     confValue = conf_df.loc[conf_df['config_key'] == confKey, 'config_value'].values[0]
     return confValue
@@ -76,7 +87,9 @@ def predict_dsl(pipeline, predtext):
 
 
 def predict_smallTalk(predtext, classifier):
-    candidate_labels = ["greeting", "general inquiry"]
+    # candidate_labels = ["greeting", "general inquiry"]
+    smalltalk_df = load_small_talk_intents()
+    candidate_labels = smalltalk_df['small_talk_intent'].tolist()
     pred = classifier(predtext, candidate_labels)
     score = np.max(pred["scores"])
     idx = pred["scores"].index(score)
@@ -119,11 +132,14 @@ def predict(pred_text, lang, model_banking, classifier_smallTalk,
     score = preds[intent]
 
     ### Score
-    if score < threshold:
-        intent = "fallback"
-        score = 0.0
-    elif score_smalltalk > threshold_smalltalk:
+    # if score_dsl > threshold_dsl:
+    #     intent = intent_dsl
+    #     score = score_dsl
+    if score_smalltalk > threshold_smalltalk:
         intent = intent_smalltalk
         score = score_smalltalk
+    elif score < threshold:
+        intent = "fallback"
+        score = 0.0
 
     return intent, score, preds
