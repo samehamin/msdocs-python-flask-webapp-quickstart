@@ -63,6 +63,21 @@ def getClassifier(lang="all"):
     return loaded_model
 
 
+# def predict_user(pred_text, tokenizer_xlmr_banking, model_xlmr_banking, device):
+#     # Tokenize the input
+#     pred_inputs = tokenizer_xlmr_banking(pred_text, return_tensors="pt")
+#     pred_inputs = {k:v.to(device) for k,v in pred_inputs.items()}
+
+#     with torch.no_grad():
+#         pred_hidden_state = model_xlmr_banking(**pred_inputs).last_hidden_state[:,0].cpu().numpy()
+
+#     # get the classifier and predict
+#     clfr = getClassifier()
+#     pred = clfr.predict(pred_hidden_state), clfr.predict_proba(pred_hidden_state)
+#     intent = getIntent(pred[0][0])
+#     score = np.max(pred[1])
+#     return intent, score
+
 def predict_user(pred_text, tokenizer_xlmr_banking, model_xlmr_banking, device):
     # Tokenize the input
     pred_inputs = tokenizer_xlmr_banking(pred_text, return_tensors="pt")
@@ -126,20 +141,20 @@ def predict(pred_text, lang, model_banking, classifier_smallTalk,
     ### Small and generic talk (XLMR Facebook multilingual model)
     #=========================#=========================
     intent_smalltalk, score_smalltalk = predict_smallTalk(pred_text, classifier_smallTalk)
-    preds[intent_smalltalk] = float(score_smalltalk)
+    # preds[intent_smalltalk] = float(score_smalltalk)
 
-    intent = max(preds.items(), key=operator.itemgetter(1))[0]
-    score = preds[intent]
+    max_intent = max(preds.items(), key=operator.itemgetter(1))[0]
+    max_score = preds[max_intent]
 
     ### Score
-    # if score_dsl > threshold_dsl:
-    #     intent = intent_dsl
-    #     score = score_dsl
-    if score_smalltalk > threshold_smalltalk:
+    if max_score >= threshold:
+        intent = max_intent
+        score = max_score
+    elif score_smalltalk > threshold_smalltalk:
         intent = intent_smalltalk
         score = score_smalltalk
-    elif score < threshold:
+    elif score <= threshold:
         intent = "fallback"
         score = 0.0
-
+        
     return intent, score, preds
