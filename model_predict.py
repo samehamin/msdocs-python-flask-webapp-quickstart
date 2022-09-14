@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import operator
 import mysqlconnector as mysqlconn
+import globals
 
 
 intents_df = None
@@ -18,7 +19,7 @@ def load_intents():
     try:
         query = "SELECT * FROM intents;"
         intents_df = mysqlconn.read_df_sqlalchemy(query)
-        print(intents_df.head())
+        # print(intents_df.head())
         return intents_df
     except mysqlconn.Error as error:
         print("database error occured: {}".format(error))
@@ -29,7 +30,7 @@ def load_config():
     try:
         query = "SELECT * FROM configs;"
         conf_df = mysqlconn.read_df_sqlalchemy(query)
-        print(conf_df.head())
+        # print(conf_df.head())
         return conf_df
     except mysqlconn.Error as error:
         print("database error occured: {}".format(error))
@@ -40,7 +41,7 @@ def load_small_talk_intents():
     try:
         query = "SELECT * FROM intents_small_talk;"
         smalltalk_df = mysqlconn.read_df_sqlalchemy(query)
-        print(smalltalk_df.head())
+        # print(smalltalk_df.head())
         return smalltalk_df
     except mysqlconn.Error as error:
         print("database error occured: {}".format(error))
@@ -62,21 +63,6 @@ def getClassifier(lang="all"):
     loaded_model = pickle.load(open(model_file, 'rb'))
     return loaded_model
 
-
-# def predict_user(pred_text, tokenizer_xlmr_banking, model_xlmr_banking, device):
-#     # Tokenize the input
-#     pred_inputs = tokenizer_xlmr_banking(pred_text, return_tensors="pt")
-#     pred_inputs = {k:v.to(device) for k,v in pred_inputs.items()}
-
-#     with torch.no_grad():
-#         pred_hidden_state = model_xlmr_banking(**pred_inputs).last_hidden_state[:,0].cpu().numpy()
-
-#     # get the classifier and predict
-#     clfr = getClassifier()
-#     pred = clfr.predict(pred_hidden_state), clfr.predict_proba(pred_hidden_state)
-#     intent = getIntent(pred[0][0])
-#     score = np.max(pred[1])
-#     return intent, score
 
 def predict_user(pred_text, tokenizer_xlmr_banking, model_xlmr_banking, device):
     # Tokenize the input
@@ -158,3 +144,9 @@ def predict(pred_text, lang, model_banking, classifier_smallTalk,
         score = 0.0
         
     return intent, score, preds
+
+
+def predictNER(predText):
+    pip_ner = pipeline("ner", model=globals.clfr_NER, tokenizer=globals.tokenizer_NER)
+    ner_results = pip_ner(predText, aggregation_strategy="simple")
+    return str(ner_results)

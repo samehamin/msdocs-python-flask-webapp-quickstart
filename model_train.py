@@ -15,7 +15,7 @@ def load_utterances():
     try:
         query = "SELECT * FROM user_utterances;"
         df_utter = mysqlconn.read_df_sqlalchemy(query)
-        print(df_utter.head())
+        # print(df_utter.head())
         
         dataset_utter = Dataset.from_pandas(df_utter)
     except mysqlconn.Error as error:

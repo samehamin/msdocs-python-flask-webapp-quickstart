@@ -13,13 +13,32 @@ def predict():
     data = request.get_json(force=True)
     lang = data['lang']
     text = data['txt']
-    prediction = mdl_predict.predict(text, lang, globals.model_xlmr_banking, globals.classifier_smallTalk,
+
+    # predict intents
+    intents = mdl_predict.predict(text, lang, globals.model_xlmr_banking, globals.classifier_smallTalk,
                              globals.tokenizer_xlmr_banking, globals.device, globals.pipe_xlmr_banking)
+
+    # predict entities 
+    ners = mdl_predict.predictNER(text)
+    
     # output = prediction
     return jsonify(
-        score = prediction[1],
-        intent = prediction[0],
-        ranked_intents = prediction[2]
+        score = intents[1],
+        intent = intents[0],
+        ranked_intents = intents[2],
+        entities = ners
+    )
+
+
+@app.route('/predictNER',methods=['POST'])
+def predictNER():
+    data = request.get_json(force=True)
+    # lang = data['lang']
+    text = data['txt']
+    prediction = mdl_predict.predictNER(text)
+    # output = prediction
+    return jsonify(
+        prediction
     )
 
 
