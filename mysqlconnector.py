@@ -22,7 +22,7 @@ def read_df_sqlalchemy(query):
     finally:
         # sql_engine.close()
         sql_engine.dispose()
-        print("MySQL connection is closed")
+        # print("MySQL connection is closed")
 
 
 # query = "SELECT * FROM nlpmvpdb.user_utterances;"

@@ -1,5 +1,3 @@
-from inspect import getclasstree, getmodule
-from posixpath import basename
 from transformers import pipeline
 import torch
 import pickle
@@ -7,7 +5,7 @@ import pandas as pd
 import numpy as np
 import operator
 import mysqlconnector as mysqlconn
-import globals
+import globals_nlp
 
 
 intents_df = None
@@ -133,9 +131,12 @@ def predict(pred_text, lang, model_banking, classifier_smallTalk,
     max_score = preds[max_intent]
 
     ### Score
-    if max_score >= threshold:
-        intent = max_intent
-        score = max_score
+    if score_dsl > threshold_dsl:
+        intent = intent_dsl
+        score = score_dsl
+    elif score_udml > threshold_udml:
+        intent = intent_udml
+        score = score_udml
     elif score_smalltalk > threshold_smalltalk:
         intent = intent_smalltalk
         score = score_smalltalk
@@ -147,6 +148,6 @@ def predict(pred_text, lang, model_banking, classifier_smallTalk,
 
 
 def predictNER(predText):
-    pip_ner = pipeline("ner", model=globals.clfr_NER, tokenizer=globals.tokenizer_NER)
+    pip_ner = pipeline("ner", model=globals_nlp.clfr_NER, tokenizer=globals_nlp.tokenizer_NER)
     ner_results = pip_ner(predText, aggregation_strategy="simple")
     return str(ner_results)

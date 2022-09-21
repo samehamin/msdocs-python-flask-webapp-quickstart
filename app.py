@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 from waitress import serve 
 import model_predict as mdl_predict
 import model_train as mdl_train
-import globals
+import globals_nlp
 
 
 app = Flask(__name__)
@@ -15,8 +15,8 @@ def predict():
     text = data['txt']
 
     # predict intents
-    intents = mdl_predict.predict(text, lang, globals.model_xlmr_banking, globals.classifier_smallTalk,
-                             globals.tokenizer_xlmr_banking, globals.device, globals.pipe_xlmr_banking)
+    intents = mdl_predict.predict(text, lang, globals_nlp.model_xlmr_banking, globals_nlp.classifier_smallTalk,
+                             globals_nlp.tokenizer_xlmr_banking, globals_nlp.device, globals_nlp.pipe_xlmr_banking)
 
     # predict entities 
     ners = mdl_predict.predictNER(text)
@@ -51,8 +51,13 @@ def train():
 
 
 if __name__ == '__main__':
-    globals.init()
-    print("init completed..")
+    print("initializing ..")
+    globals_nlp.init()
     print("server started ..")
+
+    # run for production 
     serve(app, host="0.0.0.0", port=8080)
-#    app.run(host="0.0.0.0", port=8080)
+    # run for dev 
+    # app.run(host="0.0.0.0", port=8080)
+
+

@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
-import globals
+import globals_nlp
 
 
 dataset_utter = None
@@ -16,7 +16,6 @@ def load_utterances():
         query = "SELECT * FROM user_utterances;"
         df_utter = mysqlconn.read_df_sqlalchemy(query)
         # print(df_utter.head())
-        
         dataset_utter = Dataset.from_pandas(df_utter)
     except mysqlconn.Error as error:
         print("database error occured: {}".format(error))
@@ -25,7 +24,7 @@ load_utterances()
 
 # Tokenize the whole dataset
 def tokenize(batch):
-    return globals.tokenizer_xlmr_banking(batch["utterance"], padding=True, truncation=True)
+    return globals_nlp.tokenizer_xlmr_banking(batch["utterance"], padding=True, truncation=True)
 
 
 def tokenize_dataset():
@@ -40,11 +39,11 @@ def tokenize_dataset():
 #  we’ll use the map() method of DatasetDict to extract all the hidden states in one go
 def extract_hidden_states(batch):
     # Place model inputs on the GPU
-    inputs = {k:v.to(globals.device) for k,v in batch.items()
-                if k in globals.tokenizer_xlmr_banking.model_input_names}
+    inputs = {k:v.to(globals_nlp.device) for k,v in batch.items()
+                if k in globals_nlp.tokenizer_xlmr_banking.model_input_names}
     # Extract last hidden states
     with torch.no_grad():
-        last_hidden_state = globals.model_xlmr_banking(**inputs).last_hidden_state
+        last_hidden_state = globals_nlp.model_xlmr_banking(**inputs).last_hidden_state
     # Return vector for [CLS] token
     return {"hidden_state": last_hidden_state[:,0].cpu().numpy()}
 
@@ -84,13 +83,6 @@ def save_model(clf):
 
 def train_classifier():
     X_train, y_train = create_feature_matrix()
-
-    # Let’s use these hidden states to train a logistic regression model with Scikit-learn
-    # We increase `max_iter` to guarantee convergence
-    # lr_clf = LogisticRegression(max_iter=3000)
-    # lr_clf = LogisticRegression(max_iter=3000)
-    # lr_clf.fit(X_train, y_train)
-    # lr_clf.score(X_valid, y_valid)
 
     #Linear Support Vector Machine
     clf = Pipeline([
