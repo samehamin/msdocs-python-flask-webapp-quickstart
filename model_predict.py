@@ -131,18 +131,22 @@ def predict(pred_text, lang, model_banking, classifier_smallTalk,
     max_score = preds[max_intent]
 
     ### Score
-    if score_dsl > threshold_dsl:
-        intent = intent_dsl
-        score = score_dsl
-    elif score_udml > threshold_udml:
-        intent = intent_udml
-        score = score_udml
-    elif score_smalltalk > threshold_smalltalk:
-        intent = intent_smalltalk
-        score = score_smalltalk
-    elif score <= threshold:
-        intent = "fallback"
-        score = 0.0
+    # if score_smalltalk > threshold_smalltalk:
+    #     intent = intent_smalltalk
+    #     score = score_smalltalk
+    # elif score_dsl > threshold_dsl:
+    #     intent = intent_dsl
+    #     score = score_dsl
+    # elif score_udml > threshold_udml:
+    #     intent = intent_udml
+    #     score = score_udml
+    # elif score <= threshold:
+    #     intent = "fallback"
+    #     score = 0.0
+
+    if max_score > threshold:
+        intent = max_intent
+        score = max_score
         
     return intent, score, preds
 

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
+from flask import Flask, request, jsonify
 from waitress import serve 
 import model_predict as mdl_predict
 import model_train as mdl_train
@@ -56,8 +56,8 @@ if __name__ == '__main__':
     print("server started ..")
 
     # run for production 
-    serve(app, host="0.0.0.0", port=8080)
+    # serve(app, host="0.0.0.0", port=8080)
     # run for dev 
-    # app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080)
 
 
