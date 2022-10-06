@@ -15,17 +15,18 @@ def predict():
     text = data['txt']
 
     # predict intents
-    intents = mdl_predict.predict(text, lang, globals_nlp.model_xlmr_banking, globals_nlp.classifier_smallTalk,
-                             globals_nlp.tokenizer_xlmr_banking, globals_nlp.device, globals_nlp.pipe_xlmr_banking)
+    intent, score, preds, max_intent, max_score = mdl_predict.predict(text, globals_nlp.tokenizer_xlmr_base, 
+            globals_nlp.model_xlmr_base, globals_nlp.device)
 
     # predict entities 
     ners = mdl_predict.predictNER(text)
     
     # output = prediction
     return jsonify(
-        score = intents[1],
-        intent = intents[0],
-        ranked_intents = intents[2],
+        intent = intent,
+        score = score,
+        max_intent = max_intent,
+        max_score = max_score,
         entities = ners
     )
 
@@ -59,5 +60,3 @@ if __name__ == '__main__':
     # serve(app, host="0.0.0.0", port=8080)
     # run for dev 
     app.run(host="0.0.0.0", port=8080)
-
-

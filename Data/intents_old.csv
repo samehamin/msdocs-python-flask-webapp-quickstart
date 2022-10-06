@@ -76,14 +76,3 @@ label,intent
 74,why_verify_identity
 75,wrong_amount_of_cash_received
 76,wrong_exchange_rate_for_cash_withdrawal
-77,general___affirm
-78,general___react_positive
-79,general___bye
-80,general___deny
-81,general___greet
-82,general___thank
-83,chitchat___chitchat__ask_howdoing
-84,chitchat___chitchat__ask_wherefrom
-85,chitchat___chitchat__ask_whoisit
-86,out_of_scope___out_of_scope__other
-87,add_beneficiary_account
