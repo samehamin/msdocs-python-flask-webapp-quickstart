@@ -6,6 +6,7 @@ import globals_nlp
 
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 
 @app.route('/predict',methods=['POST'])
