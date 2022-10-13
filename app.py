@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
-from waitress import serve 
-import model_predict as mdl_predict
-import model_train as mdl_train
+import model_predict_embedding as mdl_predict
+import model_train_embedding as mdl_train
 import globals_nlp
 
 
@@ -16,8 +15,7 @@ def predict():
     text = data['txt']
 
     # predict intents
-    intent, score, preds, max_intent, max_score = mdl_predict.predict(text, globals_nlp.tokenizer_xlmr_base, 
-            globals_nlp.model_xlmr_base, globals_nlp.device)
+    intent, score, ranked_intents = mdl_predict.predict(text)
 
     # predict entities 
     ners = mdl_predict.predictNER(text)
@@ -25,10 +23,9 @@ def predict():
     # output = prediction
     return jsonify(
         intent = intent,
-        score = score,
-        max_intent = max_intent,
-        max_score = max_score,
-        entities = ners
+        score = str(score),
+        ranked_intents = ranked_intents.to_json(orient='index'),
+        # entities = ners
     )
 
 

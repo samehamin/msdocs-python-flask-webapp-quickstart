@@ -1,0 +1,76 @@
+{
+  "builder_name": "csv",
+  "citation": "",
+  "config_name": "default",
+  "dataset_size": 986183,
+  "description": "",
+  "download_checksums": {
+    "/home/sameh/sourcecode/nlpmvp_train/Data/banking_train.csv": {
+      "num_bytes": 636513,
+      "checksum": "1a4fb04ddd5f91171efacc85f3f1b9d9e52b4913a084eaa3d6da7382de5c04d5"
+    },
+    "/home/sameh/sourcecode/nlpmvp_train/Data/chitchat_train.csv": {
+      "num_bytes": 47426,
+      "checksum": "f999b84a1d93970f42c158b3b186d681a917cf2b12750f581a03510924468ae0"
+    },
+    "/home/sameh/sourcecode/nlpmvp_train/Data/banking_test.csv": {
+      "num_bytes": 179795,
+      "checksum": "12ad4b8ea46bf00b4e078432e6b9fb588bd9b1f3b58607bbc8e153ee17a76d2a"
+    },
+    "/home/sameh/sourcecode/nlpmvp_train/Data/chitchat_test.csv": {
+      "num_bytes": 3052,
+      "checksum": "ea490fe834ae6832446a99b967c45efca73df08942303dc974b28b9b7b76a742"
+    }
+  },
+  "download_size": 866786,
+  "features": {
+    "text": {
+      "dtype": "string",
+      "id": null,
+      "_type": "Value"
+    },
+    "label": {
+      "dtype": "int64",
+      "id": null,
+      "_type": "Value"
+    },
+    "embedding": {
+      "feature": {
+        "dtype": "float32",
+        "id": null,
+        "_type": "Value"
+      },
+      "length": -1,
+      "id": null,
+      "_type": "Sequence"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "post_processed": null,
+  "post_processing_size": null,
+  "size_in_bytes": 1852969,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 777976,
+      "num_examples": 11940,
+      "dataset_name": "csv"
+    },
+    "valid": {
+      "name": "valid",
+      "num_bytes": 208207,
+      "num_examples": 3220,
+      "dataset_name": "csv"
+    }
+  },
+  "supervised_keys": null,
+  "task_templates": null,
+  "version": {
+    "version_str": "0.0.0",
+    "description": null,
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

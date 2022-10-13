@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.calibration import CalibratedClassifierCV
 import pandas as pd
 import globals_nlp
+import pickle
 
 
 dataset_utter = None
@@ -107,7 +108,6 @@ def create_feature_matrix():
 def save_model(clf):
     print("Saving the model ...")
     
-    import pickle
     filename = 'Data/UDModel.sav'
     pickle.dump(clf, open(filename, 'wb'))
 

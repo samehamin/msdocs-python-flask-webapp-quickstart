@@ -9,24 +9,23 @@ def init():
     global device
     global tokenizer_xlmr_base
     global model_xlmr_base
-    # global tokenizer_xlmr_banking
-    # global model_xlmr_banking
-    # global model_xlmr_banking_seq
-    # global pipe_xlmr_banking
-    # global classifier_smallTalk
+    global tokenizer_xlmr_banking
+    global model_xlmr_banking
+    global model_xlmr_banking_seq
+    global pipe_xlmr_banking
+    global classifier_smallTalk
     global tokenizer_NER
     global clfr_NER
     
-    model_ckpt = 'xlm-roberta-base'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    tokenizer_xlmr_base = AutoTokenizer.from_pretrained(model_ckpt)
-    model_xlmr_base = AutoModel.from_pretrained(model_ckpt)
+    # tokenizer_xlmr_base = AutoTokenizer.from_pretrained('xlm-roberta-base')
+    # model_xlmr_base = AutoModel.from_pretrained('xlm-roberta-base')
 
-    # loading the banking domain model for head training
-    # tokenizer_xlmr_banking = AutoTokenizer.from_pretrained('nickprock/xlm-roberta-base-banking77-classification')
-    # model_xlmr_banking = AutoModel.from_pretrained('nickprock/xlm-roberta-base-banking77-classification')
-    # model_xlmr_banking = model_xlmr_banking.to(device)
+    # loading the banking domain model for head training and embedding lookup
+    tokenizer_xlmr_banking = AutoTokenizer.from_pretrained('nickprock/xlm-roberta-base-banking77-classification')
+    model_xlmr_banking = AutoModel.from_pretrained('nickprock/xlm-roberta-base-banking77-classification')
+    model_xlmr_banking = model_xlmr_banking.to(device)
 
     # loading the banking domain model for pipeline classification
     # model_xlmr_banking_seq = AutoModelForSequenceClassification.from_pretrained('nickprock/xlm-roberta-base-banking77-classification')
