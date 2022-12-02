@@ -1,6 +1,6 @@
 transformers
 datasets
-sklearn
+scikit-learn
 sentencepiece
 matplotlib
 protobuf<=3.20.1
@@ -10,6 +10,7 @@ waitress
 mysql-connector-python
 mysqlclient
 sqlalchemy
-torch
+pytorch
 torchvision
 torchaudio
+pytorch-cuda=11.7

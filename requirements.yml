@@ -1,0 +1,11 @@
+name: nlpenv
+channels:
+dependencies:
+  - transformers
+  - datasets
+  - scikit-learn
+  - sentencepiece
+  - matplotlib
+  - protobuf<=3.20.1
+  - flask
+  - waitress
